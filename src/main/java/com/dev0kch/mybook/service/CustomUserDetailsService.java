@@ -1,6 +1,6 @@
 package com.dev0kch.mybook.service;
 
-import com.dev0kch.mybook.model.User;
+import com.dev0kch.mybook.model.Mobinaute;
 import com.dev0kch.mybook.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user =  userRepository.findByUsername(username);
+        Mobinaute user =  userRepository.findByUsername(username);
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(user.getNomUtilisateur(), user.getMotPasse(), new ArrayList<>());
     }
 
 

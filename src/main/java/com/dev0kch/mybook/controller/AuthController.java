@@ -2,9 +2,8 @@ package com.dev0kch.mybook.controller;
 
 
 import com.dev0kch.mybook.model.AuthRequest;
-import com.dev0kch.mybook.model.User;
+import com.dev0kch.mybook.model.Mobinaute;
 import com.dev0kch.mybook.repository.UserRepository;
-import com.dev0kch.mybook.service.CustomUserDetailsService;
 import com.dev0kch.mybook.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
 
 @RestController
 public class AuthController {
@@ -44,15 +40,15 @@ public class AuthController {
         try {
 
 
-            User user = userRepository.findByUsername(authRequest.getUsername());
-            if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword()) &&
-                    user.getUsername().equals(authRequest.getUsername())){
+            Mobinaute user = userRepository.findByUsername(authRequest.getNomUtilisateur());
+            if (passwordEncoder.matches(authRequest.getMotPasse(), user.getMotPasse()) &&
+                    user.getNomUtilisateur().equals(authRequest.getNomUtilisateur())){
 
                 authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(authRequest.getUsername(), user.getPassword())
+                        new UsernamePasswordAuthenticationToken(authRequest.getNomUtilisateur(), user.getMotPasse())
                 );
                 HttpHeaders responseHeaders = new HttpHeaders();
-                responseHeaders.add("authorization", jwtUtil.generateToken(authRequest.getUsername()));
+                responseHeaders.add("authorization", jwtUtil.generateToken(authRequest.getNomUtilisateur()));
 
 //                token = ResponseEntity.ok().header(responseHeaders.toString()).body("Success");
                 token = new ResponseEntity(responseHeaders, HttpStatus.OK);
@@ -72,15 +68,16 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate/register")
-    public void login(@RequestBody User user) throws Exception {
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPassword);
-        if (userRepository.findByUsername(user.getUsername()) == null){
+    public Mobinaute login(@RequestBody Mobinaute user) throws Exception {
+        String encryptedPassword = passwordEncoder.encode(user.getMotPasse());
+        user.setMotPasse(encryptedPassword);
+        if (userRepository.findByUsername(user.getNomUtilisateur()) == null){
             userRepository.save(user);
         }
         else {
             throw new Exception("username is already exist");
         }
+        return user;
     }
 
 
